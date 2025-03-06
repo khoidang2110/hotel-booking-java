@@ -3,10 +3,10 @@ package com.example.hotel_booking_java.controller;
 
 import com.example.hotel_booking_java.entity.Users;
 import com.example.hotel_booking_java.repository.UserRepository;
+import com.example.hotel_booking_java.services.UserServices;
+import com.example.hotel_booking_java.services.UserServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,10 +15,16 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    UserRepository userRepository;
+    private UserServices userServices;
+
     @GetMapping
     public List<Users> getAllUser() {
-        return userRepository.findAll();
+        return userServices.getAllUser();
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable int id) {
+        userServices.deleteUser(id);
     }
 
 }
