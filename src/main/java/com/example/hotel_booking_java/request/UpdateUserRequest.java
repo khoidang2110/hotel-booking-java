@@ -5,7 +5,7 @@ public class UpdateUserRequest {
     private String email;
     private String phone;
     //private String[] address;
-    //private List<String> address;
+    //private List<String> address; dd
     //private List<Object> address;
     public String getEmail() {
         return email;
