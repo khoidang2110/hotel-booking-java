@@ -12,6 +12,6 @@ public class HomeController {
 
     @GetMapping
     public String home() {
-        return "<h1>Khoi update 22-03-2025 </h1>";
+        return "<h1>Khoi update 08-04-2025 </h1>";
     }
 }
