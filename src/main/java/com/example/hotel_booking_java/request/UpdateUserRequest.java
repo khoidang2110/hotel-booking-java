@@ -1,5 +1,5 @@
 package com.example.hotel_booking_java.request;
-
+//nên xóa package này để chung ở pack payload
 public class UpdateUserRequest {
 
     private String email;
