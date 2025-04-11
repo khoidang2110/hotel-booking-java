@@ -1,4 +1,4 @@
-package com.example.hotel_booking_java.request;
+package com.example.hotel_booking_java.payload.request;
 
 public class UpdateUserRequest {
 
