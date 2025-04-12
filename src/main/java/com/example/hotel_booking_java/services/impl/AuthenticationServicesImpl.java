@@ -35,8 +35,8 @@ public class AuthenticationServicesImpl implements AuthenticationServices {
             throw new RuntimeException("Wrong password");
         }
 
-        // Generate token using user's email or id
-        return jwtHelper.generateToken(user.getEmail());
+        // Generate token using user
+        return jwtHelper.generateToken(user);
     }
 }
 

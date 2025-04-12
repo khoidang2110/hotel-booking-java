@@ -3,7 +3,9 @@ package com.example.hotel_booking_java.controller;
 
 
 import com.example.hotel_booking_java.entity.Users;
+import com.example.hotel_booking_java.payload.request.ChangePasswordRequest;
 import com.example.hotel_booking_java.payload.request.SignUpRequest;
+import com.example.hotel_booking_java.payload.request.UpdateUserRequest;
 import com.example.hotel_booking_java.payload.response.BaseResponse;
 import com.example.hotel_booking_java.payload.response.UserInfoResponse;
 import com.example.hotel_booking_java.repository.UserRepository;
@@ -11,8 +13,11 @@ import com.example.hotel_booking_java.services.UserServices;
 import com.example.hotel_booking_java.utils.JwtHelper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -50,29 +55,41 @@ public class UserController {
         BaseResponse response = new BaseResponse();
 
         try {
-            // Lấy token từ header
-            String token = authHeader.replace("Bearer ", "");
+            UserInfoResponse userInfo = userServices.getUserInfoFromToken(authHeader);
 
-            // Giải mã token để lấy email
-            String email = jwtHelper.decodeToken(token);
-
-            // Tìm user theo email
-            Users user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
-            // Tạo DTO để trả về, không chứa password
-            UserInfoResponse userInfo = new UserInfoResponse(
-                    user.getId(),
-                    user.getFullName(),
-                    user.getEmail(),
-                    user.getPhone()
-            );
             response.setData(userInfo);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             response.setMessage("Invalid token: " + e.getMessage());
-            return ResponseEntity.status(401).body(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUserInfo( @RequestHeader("Authorization") String authHeader,
+                                             @Valid @RequestBody UpdateUserRequest request) {
+        BaseResponse response = new BaseResponse();
+
+        try {
+            userServices.updateUserInfo(authHeader, request);
+            response.setMessage("User updated successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage("Update failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestHeader("Authorization") String authHeader,
+                                            @Valid @RequestBody ChangePasswordRequest request) {
+        try {
+            BaseResponse response = userServices.changePassword(authHeader, request);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            BaseResponse response = new BaseResponse();
+            response.setMessage("Change password failed: " + e.getMessage());
+            return ResponseEntity.status(400).body(response);
         }
     }
 

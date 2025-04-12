@@ -16,36 +16,34 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CustomAuthenFilter extends OncePerRequestFilter {
-
 
     @Autowired
     private JwtHelper jwtHelper;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
         String authenHeader = request.getHeader("Authorization");
-        //   System.out.println("kiem tra" + authenHeader);
 
-        if(authenHeader != null && authenHeader.startsWith("Bearer ")) {
+        if (authenHeader != null && authenHeader.startsWith("Bearer ")) {
             String token = authenHeader.substring(7);
 
-            String data = jwtHelper.decodeToken(token);
+            Map<String, Object> data = jwtHelper.decodeToken(token);
+            if (data != null) {
+                String email = (String) data.get("email");
 
-            if (data != null){
                 UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken("", "", List.of());
+                        new UsernamePasswordAuthenticationToken(email, null, List.of()); // hoặc authorities nếu cần
 
-
-                SecurityContext securityContext = SecurityContextHolder.getContext();
-                securityContext.setAuthentication(authenticationToken);
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
+
         filterChain.doFilter(request, response);
     }
-
-
 }

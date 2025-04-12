@@ -1,25 +1,25 @@
 package com.example.hotel_booking_java.payload.request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.Data;
+
+@Data
 public class UpdateUserRequest {
 
+    @NotEmpty(message="Email is not empty")
+    @NotNull(message="Email is not null")
+    @Email(message="Wrong email format")
     private String email;
+
+
+    private String fullName;
+
+    @Pattern(regexp = "\\d{10,}", message = "Phone must have at least 10 digits")
     private String phone;
-    //private String[] address;
-    //private List<String> address; dd
-    //private List<Object> address;
-    public String getEmail() {
-        return email;
-    }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    // Getters + Setters
 }
