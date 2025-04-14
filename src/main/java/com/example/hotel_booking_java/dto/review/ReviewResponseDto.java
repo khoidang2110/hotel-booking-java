@@ -2,6 +2,8 @@ package com.example.hotel_booking_java.dto.review;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class ReviewResponseDto {
     private Long reviewId;
@@ -11,4 +13,5 @@ public class ReviewResponseDto {
     private String comment;
     private Long userId;
     private String userName;
+    private LocalDateTime createdAt;
 }

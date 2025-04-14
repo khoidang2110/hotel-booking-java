@@ -95,6 +95,8 @@ public class ReviewServicesImpl implements ReviewServices {
             dto.setRoomId((long) review.getRoom().getId());
             dto.setUserId((long) review.getUser().getId());
             dto.setRoomNumber(review.getRoom().getRoomNumber());
+            dto.setCreatedAt(review.getCreatedAt());
+
             dto.setRating(review.getRating());
             dto.setComment(review.getComment());
             dto.setUserName(review.getUser().getFullName());
@@ -113,6 +115,7 @@ public class ReviewServicesImpl implements ReviewServices {
             dto.setRoomId((long) review.getRoom().getId());
             dto.setRoomNumber(review.getRoom().getRoomNumber());
             dto.setRating(review.getRating());
+            dto.setCreatedAt(review.getCreatedAt());
             dto.setComment(review.getComment());
             dto.setUserName(review.getUser().getFullName());
             return dto;
