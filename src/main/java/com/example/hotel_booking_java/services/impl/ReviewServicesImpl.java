@@ -62,6 +62,8 @@ public class ReviewServicesImpl implements ReviewServices {
                 // Update existing review
                 existingReview.setRating(request.getRating());
                 existingReview.setComment(request.getComment());
+                existingReview.setCreatedAt(LocalDateTime.now());
+
                 existingReview.setModifiedAt(LocalDateTime.now());
                 existingReview.setModifiedBy(userId);
                 reviewRepository.save(existingReview);
