@@ -1,10 +1,12 @@
 package com.example.hotel_booking_java.services.impl;
 
 import com.example.hotel_booking_java.dto.review.ReviewCreateDto;
+import com.example.hotel_booking_java.dto.review.ReviewResponseDto;
 import com.example.hotel_booking_java.entity.Reviews;
 import com.example.hotel_booking_java.entity.Rooms;
 import com.example.hotel_booking_java.entity.Users;
 import com.example.hotel_booking_java.enums.RoomStatus;
+import com.example.hotel_booking_java.enums.RoomType;
 import com.example.hotel_booking_java.repository.ReviewRepository;
 import com.example.hotel_booking_java.repository.RoomRepository;
 import com.example.hotel_booking_java.repository.UserRepository;
@@ -14,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewServicesImpl implements ReviewServices {
@@ -81,7 +85,39 @@ public class ReviewServicesImpl implements ReviewServices {
         }
     }
 
+    @Override
+    public List<ReviewResponseDto> getReviewsByRoomId( Long roomId) {
+        List<Reviews> reviews = reviewRepository.findByRoomId(roomId);
 
+        return reviews.stream().map(review -> {
+            ReviewResponseDto dto = new ReviewResponseDto();
+            dto.setReviewId((long) review.getId());
+            dto.setRoomId((long) review.getRoom().getId());
+            dto.setUserId((long) review.getUser().getId());
+            dto.setRoomNumber(review.getRoom().getRoomNumber());
+            dto.setRating(review.getRating());
+            dto.setComment(review.getComment());
+            dto.setUserName(review.getUser().getFullName());
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ReviewResponseDto> getReviewsByRoomType(RoomType roomType) {
+        List<Reviews> reviews = reviewRepository.findByRoom_Type(roomType);
+
+        return reviews.stream().map(review -> {
+            ReviewResponseDto dto = new ReviewResponseDto();
+            dto.setReviewId((long) review.getId());
+            dto.setRoomId((long) review.getRoom().getId());
+            dto.setRoomNumber(review.getRoom().getRoomNumber());
+            dto.setRating(review.getRating());
+            dto.setComment(review.getComment());
+            dto.setUserName(review.getUser().getFullName());
+            return dto;
+        }).collect(Collectors.toList());
+    }
     private String extractToken(String authHeader) {
         return authHeader.replace("Bearer ", "");
     }
