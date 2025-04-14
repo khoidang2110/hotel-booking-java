@@ -1,12 +1,11 @@
-package com.example.hotel_booking_java.payload.request;
+package com.example.hotel_booking_java.dto.user;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ChangePasswordRequest {
+public class ChangePasswordRequestDto {
 
     @NotNull(message="Old password must not be blank")
     private String oldPassword;

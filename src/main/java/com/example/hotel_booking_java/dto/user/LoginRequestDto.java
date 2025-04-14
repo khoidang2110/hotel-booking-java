@@ -1,11 +1,11 @@
-package com.example.hotel_booking_java.payload.request;
+package com.example.hotel_booking_java.dto.user;
 
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class LoginRequest {
+public class LoginRequestDto {
     @NotBlank(message = "Email is required")
     private String email;
 

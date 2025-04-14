@@ -1,11 +1,11 @@
 package com.example.hotel_booking_java.services.impl;
 
 import com.example.hotel_booking_java.entity.Users;
-import com.example.hotel_booking_java.payload.request.ChangePasswordRequest;
-import com.example.hotel_booking_java.payload.request.SignUpRequest;
-import com.example.hotel_booking_java.payload.request.UpdateUserRequest;
+import com.example.hotel_booking_java.dto.user.ChangePasswordRequestDto;
+import com.example.hotel_booking_java.dto.user.SignUpRequestDto;
+import com.example.hotel_booking_java.dto.user.UpdateUserRequestDto;
 import com.example.hotel_booking_java.payload.response.BaseResponse;
-import com.example.hotel_booking_java.payload.response.UserInfoResponse;
+import com.example.hotel_booking_java.dto.user.UserInfoResponseDto;
 import com.example.hotel_booking_java.repository.UserRepository;
 import com.example.hotel_booking_java.services.UserServices;
 import com.example.hotel_booking_java.utils.JwtHelper;
@@ -28,7 +28,7 @@ public class UserServicesImpl implements UserServices {
     private JwtHelper jwtHelper;
 
     @Override
-    public void signUp(SignUpRequest request) {
+    public void signUp(SignUpRequestDto request) {
 
         if (userRepository.findByPhone(request.getPhone()).isPresent()) {
             throw new RuntimeException("Phone already exists");
@@ -51,7 +51,7 @@ public class UserServicesImpl implements UserServices {
     }
 
     @Override
-    public UserInfoResponse getUserInfoFromToken(String authHeader) throws Exception {
+    public UserInfoResponseDto getUserInfoFromToken(String authHeader) throws Exception {
         String token = extractToken(authHeader);
         Map<String, Object> payload = jwtHelper.decodeToken(token);
 
@@ -59,7 +59,7 @@ public class UserServicesImpl implements UserServices {
             throw new RuntimeException("Token is invalid or expired");
         }
 
-        return new UserInfoResponse(
+        return new UserInfoResponseDto(
                 ((Number) payload.get("id")).longValue(),
                 (String) payload.get("fullName"),
                 (String) payload.get("email"),
@@ -69,7 +69,7 @@ public class UserServicesImpl implements UserServices {
     }
 
     @Override
-    public void updateUserInfo(String authHeader, UpdateUserRequest request)  {
+    public void updateUserInfo(String authHeader, UpdateUserRequestDto request)  {
         String token = extractToken(authHeader);
         Map<String, Object> payload = jwtHelper.decodeToken(token);
 
@@ -95,7 +95,7 @@ public class UserServicesImpl implements UserServices {
         userRepository.save(user);
     }
     @Override
-    public BaseResponse changePassword(String authHeader, ChangePasswordRequest request) {
+    public BaseResponse changePassword(String authHeader, ChangePasswordRequestDto request) {
         BaseResponse response = new BaseResponse();
 
         String token = extractToken(authHeader);

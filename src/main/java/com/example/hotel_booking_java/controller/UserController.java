@@ -2,22 +2,17 @@ package com.example.hotel_booking_java.controller;
 
 
 
-import com.example.hotel_booking_java.entity.Users;
-import com.example.hotel_booking_java.payload.request.ChangePasswordRequest;
-import com.example.hotel_booking_java.payload.request.SignUpRequest;
-import com.example.hotel_booking_java.payload.request.UpdateUserRequest;
+import com.example.hotel_booking_java.dto.user.ChangePasswordRequestDto;
+import com.example.hotel_booking_java.dto.user.SignUpRequestDto;
+import com.example.hotel_booking_java.dto.user.UpdateUserRequestDto;
 import com.example.hotel_booking_java.payload.response.BaseResponse;
-import com.example.hotel_booking_java.payload.response.UserInfoResponse;
-import com.example.hotel_booking_java.repository.UserRepository;
+import com.example.hotel_booking_java.dto.user.UserInfoResponseDto;
 import com.example.hotel_booking_java.services.UserServices;
-import com.example.hotel_booking_java.utils.JwtHelper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -28,14 +23,14 @@ public class UserController {
     @Autowired
     private UserServices userServices;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private JwtHelper jwtHelper;
+//    @Autowired
+//    private UserRepository userRepository;
+//
+//    @Autowired
+//    private JwtHelper jwtHelper;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequest request){
+    public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequestDto request){
 
         BaseResponse response = new BaseResponse();
         try {
@@ -55,7 +50,7 @@ public class UserController {
         BaseResponse response = new BaseResponse();
 
         try {
-            UserInfoResponse userInfo = userServices.getUserInfoFromToken(authHeader);
+            UserInfoResponseDto userInfo = userServices.getUserInfoFromToken(authHeader);
 
             response.setData(userInfo);
             return ResponseEntity.ok(response);
@@ -68,7 +63,7 @@ public class UserController {
 
     @PutMapping("/update")
     public ResponseEntity<?> updateUserInfo( @RequestHeader("Authorization") String authHeader,
-                                             @Valid @RequestBody UpdateUserRequest request) {
+                                             @Valid @RequestBody UpdateUserRequestDto request) {
         BaseResponse response = new BaseResponse();
 
         try {
@@ -82,7 +77,7 @@ public class UserController {
     }
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestHeader("Authorization") String authHeader,
-                                            @Valid @RequestBody ChangePasswordRequest request) {
+                                            @Valid @RequestBody ChangePasswordRequestDto request) {
         try {
             BaseResponse response = userServices.changePassword(authHeader, request);
             return ResponseEntity.ok(response);

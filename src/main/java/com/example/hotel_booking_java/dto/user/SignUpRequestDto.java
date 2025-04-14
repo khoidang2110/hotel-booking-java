@@ -1,4 +1,4 @@
-package com.example.hotel_booking_java.payload.request;
+package com.example.hotel_booking_java.dto.user;
 
 
 import jakarta.validation.constraints.Email;
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-public class SignUpRequest {
+public class SignUpRequestDto {
     @NotNull(message="Fullname is not null")
     private String fullName;
 

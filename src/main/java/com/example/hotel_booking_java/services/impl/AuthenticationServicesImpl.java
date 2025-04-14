@@ -3,15 +3,13 @@ package com.example.hotel_booking_java.services.impl;
 
 
 import com.example.hotel_booking_java.entity.Users;
-import com.example.hotel_booking_java.payload.request.LoginRequest;
+import com.example.hotel_booking_java.dto.user.LoginRequestDto;
 import com.example.hotel_booking_java.repository.UserRepository;
 import com.example.hotel_booking_java.services.AuthenticationServices;
 import com.example.hotel_booking_java.utils.JwtHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthenticationServicesImpl implements AuthenticationServices {
@@ -27,7 +25,7 @@ public class AuthenticationServicesImpl implements AuthenticationServices {
     private JwtHelper jwtHelper;
 
     @Override
-    public String login(LoginRequest request) {
+    public String login(LoginRequestDto request) {
         Users user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email not found"));
 
