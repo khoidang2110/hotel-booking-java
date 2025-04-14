@@ -32,7 +32,7 @@ public class ReviewServicesImpl implements ReviewServices {
     private JwtHelper jwtHelper;
 
     @Override
-    public void createReview(String authHeader, ReviewCreateDto request) {
+    public String createReview(String authHeader, ReviewCreateDto request) {
         String token = extractToken(authHeader);
         Map<String, Object> payload = jwtHelper.decodeToken(token);
 
@@ -50,9 +50,18 @@ public class ReviewServicesImpl implements ReviewServices {
 
             // Check if the user has already reviewed this room
             Reviews existingReview = reviewRepository.findByUserAndRoom(user, room);
+//            if (existingReview != null) {
+//                // If a review exists, delete the existing review
+//                reviewRepository.delete(existingReview);
+//            }
             if (existingReview != null) {
-                // If a review exists, delete the existing review
-                reviewRepository.delete(existingReview);
+                // Update existing review
+                existingReview.setRating(request.getRating());
+                existingReview.setComment(request.getComment());
+                existingReview.setModifiedAt(LocalDateTime.now());
+                existingReview.setModifiedBy(userId);
+                reviewRepository.save(existingReview);
+                return "updated";
             }
 
             Reviews review = new Reviews();
@@ -66,6 +75,7 @@ public class ReviewServicesImpl implements ReviewServices {
             review.setModifiedBy(userId); // Example: Set modifiedBy as userId
 
             reviewRepository.save(review);
+            return "created";
         } catch (Exception e) {
             throw new RuntimeException("Failed to create review: " + e.getMessage(), e);
         }

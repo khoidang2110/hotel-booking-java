@@ -25,8 +25,14 @@ public class ReviewController {
         BaseResponse response = new BaseResponse();
 
         try {
-            reviewServices.createReview(authHeader, request);
-            response.setMessage("review created successfully");
+            String result = reviewServices.createReview(authHeader, request);
+
+            if ("updated".equals(result)) {
+                response.setMessage("review updated successfully");
+            } else {
+                response.setMessage("review created successfully");
+            }
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.setMessage("created failed: " + e.getMessage());
