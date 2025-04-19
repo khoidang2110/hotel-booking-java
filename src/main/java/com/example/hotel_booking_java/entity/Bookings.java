@@ -1,6 +1,7 @@
 package com.example.hotel_booking_java.entity;
 
 import com.example.hotel_booking_java.enums.BookingEnum;
+import com.example.hotel_booking_java.persistence.converter.BookingEnumConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.security.Timestamp;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
@@ -28,12 +29,12 @@ public class Bookings {
     private Rooms room;
 
     @Column(name = "check_in", nullable = false)
-    private LocalDate checkIn;
+    private LocalDateTime checkIn;
 
     @Column(name = "check_out", nullable = false)
-    private LocalDate checkOut;
+    private LocalDateTime checkOut;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = BookingEnumConverter.class)
     @Column(nullable = false)
     private BookingEnum status = BookingEnum.PENDING;
 

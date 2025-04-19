@@ -6,15 +6,15 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.security.Timestamp;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class BookingDTO {
     private Integer id;
     private Integer userId;
     private Rooms room;
-    private LocalDate checkIn;
-    private LocalDate checkOut;
+    private LocalDateTime checkIn;
+    private LocalDateTime checkOut;
     private BookingEnum status = BookingEnum.PENDING;
     private BigDecimal totalPrice;
     private Integer couponDiscountId;
