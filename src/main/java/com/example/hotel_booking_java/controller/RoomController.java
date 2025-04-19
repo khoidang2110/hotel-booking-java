@@ -1,14 +1,16 @@
 package com.example.hotel_booking_java.controller;
 
 import com.example.hotel_booking_java.dto.RoomDTO;
+import com.example.hotel_booking_java.payload.request.RoomRequest;
 import com.example.hotel_booking_java.payload.response.BaseResponse;
 import com.example.hotel_booking_java.services.RoomServices;
 import com.example.hotel_booking_java.utils.JwtHelper;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -17,90 +19,40 @@ import java.util.Map;
 public class RoomController {
     @Autowired
     private RoomServices roomServices;
-
+    
     @Autowired
-    private JwtHelper jwtHelper;
+    private JwtHelper jwt;
 
-    /**
-     * Insert a new Room.
-     * Expects the following parameters:
-     * - roomNumber, type, price and optional description.
-     * The Authorization header must be provided with a valid Bearer token.
-     */
+
     @PostMapping
-    public ResponseEntity<BaseResponse> insertRoom(
-            @RequestHeader("Authorization") String authorization,
-            @RequestParam String roomNumber,
-            @RequestParam String type, // e.g., "SINGLE", "DOUBLE", "SUITE"
-            @RequestParam BigDecimal price,
-            @RequestParam(required = false) String description) {
-        String token = authorization.startsWith("Bearer ") ? authorization.substring(7) : authorization;
-        Map<String, Object> claims = jwtHelper.decodeToken(token);
-        if (claims == null || claims.get("id") == null) {
-            BaseResponse response = new BaseResponse();
-            response.setCode(401);
-            response.setMessage("Invalid or expired token");
-            return ResponseEntity.status(401).body(response);
-        }
+    public ResponseEntity<BaseResponse> createRoom(
+            @RequestHeader("Authorization") String auth,
+            @Valid @RequestBody RoomRequest req) {
 
-        int userId = (int) claims.get("id");
-
-        roomServices.insertRoom(roomNumber, type, price, description, userId);
-
-        BaseResponse response = new BaseResponse();
-        response.setCode(200);
-        response.setMessage("Room inserted successfully");
-        return ResponseEntity.ok(response);
+        int userId = tokenUserId(auth);
+        RoomDTO dto = roomServices.createRoom(req, userId);
+        return ok("Room created", dto);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponse> updateRoom(
-            @RequestHeader("Authorization") String authorization,
+            @RequestHeader("Authorization") String auth,
             @PathVariable int id,
-            @RequestParam(required = false) String roomNumber,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) BigDecimal price,
-            @RequestParam(required = false) String description) {
+            @RequestBody RoomRequest req) {
 
-        String token = authorization.startsWith("Bearer ") ? authorization.substring(7) : authorization;
-        Map<String, Object> claims = jwtHelper.decodeToken(token);
-        if (claims == null || claims.get("id") == null) {
-            BaseResponse response = new BaseResponse();
-            response.setCode(401);
-            response.setMessage("Invalid or expired token");
-            return ResponseEntity.status(401).body(response);
-        }
-
-        int userId = (int) claims.get("id");
-
-        roomServices.updateRoom(id, roomNumber, type, price, description, userId);
-
-        BaseResponse response = new BaseResponse();
-        response.setCode(200);
-        response.setMessage("Room updated successfully");
-        return ResponseEntity.ok(response);
+        int userId = tokenUserId(auth);
+        RoomDTO dto = roomServices.updateRoom(id, req, userId);
+        return ok("Room updated", dto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse> deleteRoom(
-            @RequestHeader("Authorization") String authorization,
+            @RequestHeader("Authorization") String auth,
             @PathVariable int id) {
 
-        String token = authorization.startsWith("Bearer ") ? authorization.substring(7) : authorization;
-        Map<String, Object> claims = jwtHelper.decodeToken(token);
-        if (claims == null || claims.get("id") == null) {
-            BaseResponse response = new BaseResponse();
-            response.setCode(401);
-            response.setMessage("Invalid or expired token");
-            return ResponseEntity.status(401).body(response);
-        }
-
+        tokenUserId(auth);           // validate token only
         roomServices.deleteRoom(id);
-
-        BaseResponse response = new BaseResponse();
-        response.setCode(200);
-        response.setMessage("Room deleted successfully");
-        return ResponseEntity.ok(response);
+        return ok("Room deleted", null);
     }
 
     @GetMapping
@@ -108,11 +60,47 @@ public class RoomController {
             @RequestParam int pageNumber,
             @RequestParam int pageSize) {
 
-        List<RoomDTO> roomList = roomServices.getAllRooms(pageNumber, pageSize);
-        BaseResponse response = new BaseResponse();
-        response.setCode(200);
-        response.setMessage("Rooms retrieved successfully");
-        response.setData(roomList);
-        return ResponseEntity.ok(response);
+        List<RoomDTO> list = roomServices.getAllRooms(pageNumber, pageSize);
+        return ok("success", list);
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<BaseResponse> findAvailableRooms(
+            @RequestParam LocalDate checkIn,
+            @RequestParam LocalDate checkOut) {
+
+        List<RoomDTO> list = roomServices.findAvailable(checkIn, checkOut);
+        return ok("success", list);
+    }
+
+    @PostMapping("/{id}/is-available")
+    public ResponseEntity<BaseResponse> isRoomAvailable(
+            @PathVariable int id,
+            @RequestParam LocalDate checkIn,
+            @RequestParam LocalDate checkOut) {
+
+        boolean free = roomServices.isRoomAvailable(id, checkIn, checkOut);
+        return ok("success", free);
+    }
+
+    private int tokenUserId(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer "))
+            throw new RuntimeException("Missing token");
+
+        String token = authHeader.substring(7);
+        Map<String, Object> claims = jwt.decodeToken(token);
+
+        if (claims == null || claims.get("id") == null)
+            throw new RuntimeException("Invalid or expired token");
+
+        return (Integer) claims.get("id");
+    }
+
+    private ResponseEntity<BaseResponse> ok(String msg, Object data) {
+        BaseResponse r = new BaseResponse();
+        r.setCode(200);
+        r.setMessage(msg);
+        r.setData(data);
+        return ResponseEntity.ok(r);
     }
 }

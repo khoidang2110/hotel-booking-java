@@ -4,6 +4,7 @@ import com.example.hotel_booking_java.dto.RoomDTO;
 import com.example.hotel_booking_java.entity.Rooms;
 import com.example.hotel_booking_java.enums.RoomStatus;
 import com.example.hotel_booking_java.enums.RoomType;
+import com.example.hotel_booking_java.payload.request.RoomRequest;
 import com.example.hotel_booking_java.repository.RoomRepository;
 import com.example.hotel_booking_java.services.RoomServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,74 +25,68 @@ public class RoomServicesImpl implements RoomServices {
     @Autowired
     private RoomRepository roomRepository;
 
-    @Override
-    public void insertRoom(String roomNumber, String type, BigDecimal price, String description, int userId) {
-        try {
-            Rooms room = new Rooms();
-            room.setRoomNumber(roomNumber);
-            room.setType(RoomType.valueOf(type.toUpperCase()));
-            room.setPrice(price);
-            room.setDescription(description);
-            room.setStatus(RoomStatus.AVAILABLE);
-            room.setCreatedAt(LocalDateTime.now());
-            room.setModifiedAt(LocalDateTime.now());
-            room.setCreatedBy(userId);
-            room.setModifiedBy(userId);
+    private RoomDTO toDto(Rooms r) {
+        RoomDTO d = new RoomDTO();
+        d.setId(r.getId());
+        d.setRoomNumber(r.getRoomNumber());
+        d.setType(r.getType());
+        d.setPrice(r.getPrice());
+        d.setStatus(r.getStatus());
+        d.setDescription(r.getDescription());
+        d.setCreatedAt(r.getCreatedAt());
+        d.setModifiedAt(r.getModifiedAt());
+        d.setCreatedBy(r.getCreatedBy());
+        d.setModifiedBy(r.getModifiedBy());
+        return d;
+    }
 
-            roomRepository.save(room);
-        } catch (Exception e) {
-            throw new RuntimeException("Room insertion failed: " + e.getMessage());
-        }
+    @Override
+    public List<RoomDTO> findAvailable(LocalDate checkIn, LocalDate checkOut) {
+        return roomRepository.findAvailableRooms(checkIn, checkOut)
+                .stream().map(this::toDto).collect(Collectors.toList());    }
+
+    @Override
+    public boolean isRoomAvailable(int roomId, LocalDate checkIn, LocalDate checkOut) {
+        return roomRepository.findAvailableRooms(checkIn, checkOut)
+                .stream().anyMatch(r -> r.getId() == roomId);
+    }
+
+    @Override
+    public RoomDTO createRoom(RoomRequest req, int userId) {
+        Rooms room = new Rooms();
+        room.setRoomNumber(req.getRoomNumber().trim());
+        room.setType(req.getType());
+        room.setPrice(req.getPrice());
+        room.setDescription(req.getDescription());
+        room.setStatus(RoomStatus.AVAILABLE);
+        room.setCreatedBy(userId);
+        room.setModifiedBy(userId);
+
+        return toDto(roomRepository.save(room));
     }
 
     @Override
     public List<RoomDTO> getAllRooms(int pageNumber, int pageSize) {
-        PageRequest pageable = PageRequest.of(pageNumber, pageSize);
-        Page<Rooms> roomPage = roomRepository.findAll(pageable);
-        return roomPage.getContent().stream()
-                .map(room -> {
-                    RoomDTO dto = new RoomDTO();
-                    dto.setId(room.getId());
-                    dto.setRoomNumber(room.getRoomNumber());
-                    dto.setType(room.getType());
-                    dto.setPrice(room.getPrice());
-                    dto.setDescription(room.getDescription());
-                    dto.setStatus(room.getStatus());
-                    // Optionally, set createdAt, modifiedAt, createdBy, modifiedBy if needed
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        return roomRepository.findAll(PageRequest.of(pageNumber, pageSize))
+                .stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public void updateRoom(int id, String roomNumber, String type, BigDecimal price, String description, int userId) {
-        Optional<Rooms> roomOpt = roomRepository.findById(id);
-        if (roomOpt.isEmpty()) {
-            throw new RuntimeException("Room not found with id " + id);
-        }
-        Rooms room = roomOpt.get();
+    public RoomDTO updateRoom(int id, RoomRequest req, int userId) {
 
-        if (roomOpt.get().getRoomNumber() != null && !roomOpt.get().getRoomNumber().trim().isEmpty()) {
-            room.setRoomNumber(roomOpt.get().getRoomNumber());
-        }
+        Rooms r = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        if (roomOpt.get().getType() != null) {
-            room.setType(roomOpt.get().getType());
-        }
+        if (req.getRoomNumber() != null && !req.getRoomNumber().isBlank())
+            r.setRoomNumber(req.getRoomNumber().trim());
+        if (req.getType()  != null)       r.setType(req.getType());
+        if (req.getPrice() != null)       r.setPrice(req.getPrice());
+        if (req.getDescription() != null) r.setDescription(req.getDescription());
 
-        if (roomOpt.get().getPrice() != null) {
-            room.setPrice(roomOpt.get().getPrice());
-        }
+        r.setModifiedAt(LocalDateTime.now());
+        r.setModifiedBy(userId);
 
-        if (roomOpt.get().getDescription() != null && !roomOpt.get().getDescription().trim().isEmpty()) {
-            room.setDescription(roomOpt.get().getDescription());
-        }
-
-        room.setModifiedAt(LocalDateTime.now());
-        room.setModifiedBy(userId);
-
-        roomRepository.save(room);
-    }
+        return toDto(roomRepository.save(r));    }
 
     @Override
     public void deleteRoom(int id) {

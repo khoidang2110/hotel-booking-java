@@ -1,13 +1,17 @@
 package com.example.hotel_booking_java.services;
 
 import com.example.hotel_booking_java.dto.RoomDTO;
+import com.example.hotel_booking_java.payload.request.RoomRequest;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface RoomServices {
-    void insertRoom(String roomNumber, String type, BigDecimal price, String description, int userId);
+    List<RoomDTO> findAvailable(LocalDate checkIn, LocalDate checkOut);
+    boolean isRoomAvailable(int roomId, LocalDate checkIn, LocalDate checkOut);
+    RoomDTO createRoom(RoomRequest req, int userId);
     List<RoomDTO> getAllRooms(int pageNumber, int pageSize);
-    void updateRoom(int id, String roomNumber, String type, BigDecimal price, String description, int userId);
+    RoomDTO updateRoom(int id, RoomRequest req, int userId);
     void deleteRoom(int id);
 }

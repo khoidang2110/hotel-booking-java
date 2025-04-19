@@ -5,7 +5,8 @@ import com.example.hotel_booking_java.enums.RoomType;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.security.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class RoomDTO {
@@ -15,8 +16,8 @@ public class RoomDTO {
     private BigDecimal price;
     private RoomStatus status = RoomStatus.AVAILABLE;
     private String description;
-    private Timestamp createdAt;
-    private Timestamp modifiedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
     private Integer createdBy;
     private Integer modifiedBy;
 }
