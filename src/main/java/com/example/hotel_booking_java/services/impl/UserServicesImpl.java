@@ -64,7 +64,9 @@ public class UserServicesImpl implements UserServices {
                 (String) payload.get("fullName"),
                 (String) payload.get("email"),
                 (String) payload.get("phone"),
-                ((Number) payload.get("role_id")).intValue()
+                ((Number) payload.get("role_id")).intValue(),
+                (String) payload.get("role_name")  // Thêm role_name vào
+
         );
     }
 

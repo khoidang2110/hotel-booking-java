@@ -40,4 +40,9 @@ public class Users {
     @Column(name = "modified_by")
     private int modifiedBy;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Roles role;
+
+
 }

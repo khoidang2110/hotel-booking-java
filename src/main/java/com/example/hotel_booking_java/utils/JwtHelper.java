@@ -30,6 +30,7 @@ public class JwtHelper {
         claims.put("email", user.getEmail());
         claims.put("phone", user.getPhone());
         claims.put("role_id", user.getRoleId());
+        claims.put("role_name", user.getRole().getName());  // Lấy role_name từ đối tượng Roles
 
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
 
