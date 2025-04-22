@@ -2,10 +2,11 @@ package com.example.hotel_booking_java.services;
 
 
 import com.example.hotel_booking_java.dto.user.LoginRequestDto;
+import com.example.hotel_booking_java.dto.user.LoginResponseDto;
 
 public interface AuthenticationServices {
 
 
-    String login(LoginRequestDto request);
+    LoginResponseDto login(LoginRequestDto request);
 
 }

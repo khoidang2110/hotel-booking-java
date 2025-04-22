@@ -2,6 +2,7 @@ package com.example.hotel_booking_java.services.impl;
 
 
 
+import com.example.hotel_booking_java.dto.user.LoginResponseDto;
 import com.example.hotel_booking_java.entity.Users;
 import com.example.hotel_booking_java.dto.user.LoginRequestDto;
 import com.example.hotel_booking_java.repository.UserRepository;
@@ -25,7 +26,7 @@ public class AuthenticationServicesImpl implements AuthenticationServices {
     private JwtHelper jwtHelper;
 
     @Override
-    public String login(LoginRequestDto request) {
+    public LoginResponseDto login(LoginRequestDto request) {
         Users user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email not found"));
 
@@ -34,7 +35,10 @@ public class AuthenticationServicesImpl implements AuthenticationServices {
         }
 
         // Generate token using user
-        return jwtHelper.generateToken(user);
+        String token = jwtHelper.generateToken(user);
+        String fullName = user.getFullName();
+
+        return new LoginResponseDto(token, fullName);
     }
 }
 
