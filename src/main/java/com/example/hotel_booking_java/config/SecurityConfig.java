@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .cors(cors ->cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request-> {
-                    request.requestMatchers("/auth/login","/user/sign-up","/upload","/product/**","/files/**","/","/review/room-id","/review/room-type").permitAll();
+                    request.requestMatchers("/auth/login","/user/sign-up","/upload","/product/**","/files/**","/","/review/room-id","/review/room-type","/room/**","/booking/**").permitAll();
                     request.anyRequest().authenticated();
                 })
                 .addFilterBefore(customAuthenFilter, UsernamePasswordAuthenticationFilter.class)

@@ -2,12 +2,13 @@ package com.example.hotel_booking_java.entity;
 
 import com.example.hotel_booking_java.enums.RoomStatus;
 import com.example.hotel_booking_java.enums.RoomType;
+import com.example.hotel_booking_java.persistence.converter.RoomStatusEnumConverter;
+import com.example.hotel_booking_java.persistence.converter.RoomTypeEnumConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "rooms")
@@ -21,14 +22,14 @@ public class Rooms {
     @Column(name = "room_number", unique = true, nullable = false)
     private String roomNumber;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = RoomTypeEnumConverter.class)
     @Column(name = "type", nullable = false)
     private RoomType type;
 
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = RoomStatusEnumConverter.class)
     @Column(name = "status", nullable = false)
     private RoomStatus status = RoomStatus.AVAILABLE;
 
