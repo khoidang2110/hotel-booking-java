@@ -28,10 +28,10 @@ public class AuthenticationServicesImpl implements AuthenticationServices {
     @Override
     public LoginResponseDto login(LoginRequestDto request) {
         Users user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy email"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Wrong password");
+            throw new RuntimeException("Sai mật khẩu");
         }
 
         // Generate token using user
