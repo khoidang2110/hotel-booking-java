@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,11 +17,11 @@ public class BookingRequest {
 
     @NotNull(message = "check‑in date is required")
     @Future(message = "check‑in must be in the future")
-    private LocalDateTime checkIn;
+    private LocalDate checkIn;
 
     @NotNull(message = "check‑out date is required")
     @Future(message = "check‑out must be in the future")
-    private LocalDateTime checkOut;
+    private LocalDate checkOut;
 
     private BookingEnum status;
 

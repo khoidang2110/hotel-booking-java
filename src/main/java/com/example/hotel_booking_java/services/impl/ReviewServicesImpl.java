@@ -37,7 +37,7 @@ public class ReviewServicesImpl implements ReviewServices {
 
     @Override
     public String createReview(String authHeader, ReviewCreateDto request) {
-        String token = extractToken(authHeader);
+        String token = jwtHelper.extractToken(authHeader);
         Map<String, Object> payload = jwtHelper.decodeToken(token);
 
         if (payload == null) {
@@ -123,9 +123,7 @@ public class ReviewServicesImpl implements ReviewServices {
             return dto;
         }).collect(Collectors.toList());
     }
-    private String extractToken(String authHeader) {
-        return authHeader.replace("Bearer ", "");
-    }
+
 
 
 }

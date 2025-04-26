@@ -1,7 +1,9 @@
 package com.example.hotel_booking_java.entity;
 
+
+
+
 import com.example.hotel_booking_java.enums.BookingEnum;
-import com.example.hotel_booking_java.persistence.converter.BookingEnumConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.security.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,8 +23,11 @@ public class Bookings {
     private Integer id;
 
     // For demonstration, we use a simple integer for user reference.
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+//    @Column(name = "user_id", nullable = false)
+//    private Integer userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
 
     // Many bookings can be associated with one room.
     @ManyToOne
@@ -29,12 +35,13 @@ public class Bookings {
     private Rooms room;
 
     @Column(name = "check_in", nullable = false)
-    private LocalDateTime checkIn;
+    private LocalDate checkIn;
 
     @Column(name = "check_out", nullable = false)
-    private LocalDateTime checkOut;
+    private LocalDate checkOut;
 
-    @Convert(converter = BookingEnumConverter.class)
+    //@Convert(converter = BookingEnumConverter.class)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookingEnum status = BookingEnum.PENDING;
 
@@ -50,11 +57,12 @@ public class Bookings {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
+
 
     @UpdateTimestamp
     @Column(name = "modified_at", nullable = false)
-    private Timestamp modifiedAt;
+    private LocalDateTime modifiedAt;
 
     @Column(name = "created_by")
     private Integer createdBy;

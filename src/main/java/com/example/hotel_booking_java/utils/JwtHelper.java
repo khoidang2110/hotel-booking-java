@@ -1,6 +1,7 @@
 package com.example.hotel_booking_java.utils;
 
 
+import com.example.hotel_booking_java.dto.user.UserPermissionDto;
 import com.example.hotel_booking_java.entity.Users;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -60,4 +61,60 @@ public class JwtHelper {
 
         return null;
     }
+    public String extractToken(String authHeader) {
+        return authHeader.replace("Bearer ", "");
+    }
+    public UserPermissionDto getUserPermission(String authHeader) {
+        String token = extractToken(authHeader);
+        Map<String, Object> payload = decodeToken(token);
+
+        if (payload == null) {
+            throw new RuntimeException("Token is invalid or expired");
+        }
+
+        String role = (String) payload.get("role_name");
+        Integer userId = Integer.parseInt(payload.get("id").toString());
+
+        UserPermissionDto userPermissionDto = new UserPermissionDto();
+        userPermissionDto.setUserId(userId);
+
+        if (role == null || (!"ROLE_ADMIN".equals(role) && !"ROLE_STAFF".equals(role))) {
+            userPermissionDto.setHasPermission(false);
+        } else {
+            userPermissionDto.setHasPermission(true);
+        }
+
+        return userPermissionDto;
+    }
+
+
+//    public int getUserIdIfAdminOrStaff(String authHeader) {
+//        String token = extractToken(authHeader);
+//        Map<String, Object> payload = decodeToken(token);
+//
+//        if (payload == null) {
+//            throw new RuntimeException("Token is invalid or expired");
+//        }
+//
+//        String role = (String) payload.get("role_name");
+//        if (role == null || (!"ROLE_ADMIN".equals(role) && !"ROLE_STAFF".equals(role))) {
+//            throw new RuntimeException("Permission denied");
+//        }
+//
+//        return Integer.parseInt(payload.get("id").toString());
+//    }
+//
+//    public boolean isAdminOrStaff(String authHeader) {
+//        String token = extractToken(authHeader);
+//        Map<String, Object> payload = decodeToken(token);
+//
+//        if (payload == null) {
+//            throw new RuntimeException("Token is invalid or expired");
+//        }
+//
+//        String role = (String) payload.get("role_name");
+//        return "ROLE_ADMIN".equals(role) || "ROLE_STAFF".equals(role);
+//    }
+
+
 }

@@ -52,7 +52,7 @@ public class UserServicesImpl implements UserServices {
 
     @Override
     public UserInfoResponseDto getUserInfoFromToken(String authHeader) throws Exception {
-        String token = extractToken(authHeader);
+        String token = jwtHelper.extractToken(authHeader);
         Map<String, Object> payload = jwtHelper.decodeToken(token);
 
         if (payload == null) {
@@ -72,7 +72,7 @@ public class UserServicesImpl implements UserServices {
 
     @Override
     public void updateUserInfo(String authHeader, UpdateUserRequestDto request)  {
-        String token = extractToken(authHeader);
+        String token = jwtHelper.extractToken(authHeader);
         Map<String, Object> payload = jwtHelper.decodeToken(token);
 
         if (payload == null) {
@@ -100,7 +100,7 @@ public class UserServicesImpl implements UserServices {
     public BaseResponse changePassword(String authHeader, ChangePasswordRequestDto request) {
         BaseResponse response = new BaseResponse();
 
-        String token = extractToken(authHeader);
+        String token = jwtHelper.extractToken(authHeader);
         Map<String, Object> payload = jwtHelper.decodeToken(token);
 
         if (payload == null) {
@@ -122,8 +122,6 @@ public class UserServicesImpl implements UserServices {
         response.setMessage("Password changed successfully");
         return response;
     }
-    private String extractToken(String authHeader) {
-        return authHeader.replace("Bearer ", "");
-    }
+
 
 }

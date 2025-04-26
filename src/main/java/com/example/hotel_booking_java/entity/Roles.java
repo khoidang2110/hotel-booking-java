@@ -1,5 +1,7 @@
 package com.example.hotel_booking_java.entity;
 
+
+import com.example.hotel_booking_java.enums.RoleEnum;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -11,8 +13,9 @@ public class Roles {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(unique = true, nullable = false)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(name="name", nullable = false)
+    private RoleEnum name;
 
 
 }

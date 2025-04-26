@@ -16,14 +16,19 @@ public class Reviews {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // KHÔNG cần userId nữa
+
+    @Column(name = "user_id", nullable = false)
+    private int userId;
+
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id", insertable = false, updatable = false)
     private Users user;
 
-    // KHÔNG cần roomId nữa
+    @Column(name = "room_id", nullable = false)
+    private int roomId;
+
     @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false)
+    @JoinColumn(name = "room_id", nullable = false, referencedColumnName = "id", insertable = false, updatable = false)
     private Rooms room;
 
     @Column(name = "rating", nullable = false)

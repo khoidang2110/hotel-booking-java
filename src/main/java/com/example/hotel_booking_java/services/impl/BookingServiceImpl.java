@@ -3,6 +3,7 @@ package com.example.hotel_booking_java.services.impl;
 import com.example.hotel_booking_java.dto.BookingDTO;
 import com.example.hotel_booking_java.entity.Bookings;
 import com.example.hotel_booking_java.entity.Rooms;
+import com.example.hotel_booking_java.entity.Users;
 import com.example.hotel_booking_java.enums.BookingEnum;
 import com.example.hotel_booking_java.payload.request.BookingRequest;
 import com.example.hotel_booking_java.repository.BookingRepo;
@@ -35,7 +36,7 @@ public class BookingServiceImpl implements BookingServices {
         BookingDTO d = new BookingDTO();
         d.setId(b.getId());
         d.setRoom(b.getRoom());
-        d.setUserId(b.getUserId());
+        d.setUserId(b.getUser().getId());
         d.setCheckIn(b.getCheckIn());
         d.setCheckOut(b.getCheckOut());
         d.setStatus(b.getStatus());
@@ -52,7 +53,10 @@ public class BookingServiceImpl implements BookingServices {
 
         Bookings b = new Bookings();
         b.setRoom(room);
-        b.setUserId(userId);
+        Users user = new Users();
+        user.setId(userId); // set userId cho đối tượng User
+        b.setUser(user);
+
 
         b.setCheckIn(r.getCheckIn());
         b.setCheckOut(r.getCheckOut());
