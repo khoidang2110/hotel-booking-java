@@ -73,7 +73,10 @@ public class ReviewServicesImpl implements ReviewServices {
 
             // Create new review
             Reviews review = new Reviews();
+
+            review.setRoomId(request.getRoomId());  // Set roomId explicitly
             review.setRoom(room);
+            review.setUserId(userId);  // Set userId explicitly
             review.setUser(user);
             review.setRating(request.getRating());
             review.setComment(request.getComment());
