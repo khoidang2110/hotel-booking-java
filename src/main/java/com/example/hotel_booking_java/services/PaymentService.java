@@ -13,4 +13,6 @@ public interface PaymentService {
   List<Payments> getAllPayments(String authHeader, int page, int size);
 
     void updatePayment(String authHeader, UpdatePaymentDto request);
+    void deletePayment(String authHeader,int id);
+
 }

@@ -135,6 +135,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public void updatePayment(String authHeader, UpdatePaymentDto request) {
+        // Kiểm tra quyền người dùng từ JWT
+        UserPermissionDto permission = jwtHelper.getUserPermission(authHeader);
+        if (!permission.isHasPermission()) {
+            throw new RuntimeException("Permission denied");
+        }
         // Kiểm tra và lấy thông tin user từ authHeader nếu cần
         Payments payment = paymentRepository.findById(request.getId())
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
@@ -154,7 +159,19 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
 
+    @Override
+    public void deletePayment(String authHeader, int id) {
+        // Kiểm tra quyền người dùng từ JWT
+        UserPermissionDto permission = jwtHelper.getUserPermission(authHeader);
+        if (!permission.isHasPermission()) {
+            throw new RuntimeException("Permission denied");
+        }
 
+        if (!paymentRepository.existsById(id)) {
+            throw new RuntimeException("payment not found with id " + id);
+        }
+        paymentRepository.deleteById(id);
+    }
 
 
 }

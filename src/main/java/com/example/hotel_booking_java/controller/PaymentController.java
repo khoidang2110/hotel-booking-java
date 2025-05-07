@@ -82,6 +82,23 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+    @DeleteMapping("/delete")
+    public ResponseEntity<BaseResponse> deletePayment(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam("id") int id) {
+        BaseResponse response = new BaseResponse();
+
+        try {
+
+            paymentService.deletePayment(authHeader,id);
+            response.setMessage("Payment deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage("Delete failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
 
     @GetMapping("/get-by-id")
     public ResponseEntity<BaseResponse> getPaymentById(
