@@ -146,6 +146,9 @@ public class PaymentServiceImpl implements PaymentService {
         if (request.getStatus() != null) {
             payment.setStatus(request.getStatus());
         }
+        if (request.getPaymentMethod() != null) {
+            payment.setPaymentMethod(request.getPaymentMethod());
+        }
 
         paymentRepository.save(payment); // Lưu lại bản cập nhật
     }
