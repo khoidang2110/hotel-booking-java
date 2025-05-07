@@ -88,33 +88,6 @@ public class JwtHelper {
     }
 
 
-//    public int getUserIdIfAdminOrStaff(String authHeader) {
-//        String token = extractToken(authHeader);
-//        Map<String, Object> payload = decodeToken(token);
-//
-//        if (payload == null) {
-//            throw new RuntimeException("Token is invalid or expired");
-//        }
-//
-//        String role = (String) payload.get("role_name");
-//        if (role == null || (!"ROLE_ADMIN".equals(role) && !"ROLE_STAFF".equals(role))) {
-//            throw new RuntimeException("Permission denied");
-//        }
-//
-//        return Integer.parseInt(payload.get("id").toString());
-//    }
-//
-//    public boolean isAdminOrStaff(String authHeader) {
-//        String token = extractToken(authHeader);
-//        Map<String, Object> payload = decodeToken(token);
-//
-//        if (payload == null) {
-//            throw new RuntimeException("Token is invalid or expired");
-//        }
-//
-//        String role = (String) payload.get("role_name");
-//        return "ROLE_ADMIN".equals(role) || "ROLE_STAFF".equals(role);
-//    }
 
 
 }

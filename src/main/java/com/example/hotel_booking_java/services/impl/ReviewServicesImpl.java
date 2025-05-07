@@ -35,6 +35,7 @@ public class ReviewServicesImpl implements ReviewServices {
     @Autowired
     private JwtHelper jwtHelper;
 
+
     @Override
     public String createReview(String authHeader, ReviewCreateDto request) {
         String token = jwtHelper.extractToken(authHeader);
@@ -46,30 +47,31 @@ public class ReviewServicesImpl implements ReviewServices {
 
         try {
             int userId = ((Number) payload.get("id")).intValue();
+            System.out.println("Extracted User ID: " + userId);  // Log the user ID
+
+            // Check if user exists
             Users user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+            System.out.println("Found user: " + user.getId());
 
             Rooms room = roomRepository.findById(request.getRoomId())
                     .orElseThrow(() -> new RuntimeException("Room not found with ID: " + request.getRoomId()));
+            System.out.println("Found room: " + room.getId());
 
             // Check if the user has already reviewed this room
             Reviews existingReview = reviewRepository.findByUserAndRoom(user, room);
-//            if (existingReview != null) {
-//                // If a review exists, delete the existing review
-//                reviewRepository.delete(existingReview);
-//            }
             if (existingReview != null) {
                 // Update existing review
                 existingReview.setRating(request.getRating());
                 existingReview.setComment(request.getComment());
                 existingReview.setCreatedAt(LocalDateTime.now());
-
                 existingReview.setModifiedAt(LocalDateTime.now());
                 existingReview.setModifiedBy(userId);
                 reviewRepository.save(existingReview);
                 return "updated";
             }
 
+            // Create new review
             Reviews review = new Reviews();
             review.setRoom(room);
             review.setUser(user);
@@ -77,15 +79,67 @@ public class ReviewServicesImpl implements ReviewServices {
             review.setComment(request.getComment());
             review.setCreatedAt(LocalDateTime.now());
             review.setModifiedAt(LocalDateTime.now());
-            review.setCreatedBy(userId); // Example: Set createdBy as userId
-            review.setModifiedBy(userId); // Example: Set modifiedBy as userId
+            review.setCreatedBy(userId);  // Set createdBy as userId
+            review.setModifiedBy(userId); // Set modifiedBy as userId
 
             reviewRepository.save(review);
             return "created";
         } catch (Exception e) {
+            System.err.println("Error creating review: " + e.getMessage()); // Log the error
             throw new RuntimeException("Failed to create review: " + e.getMessage(), e);
         }
     }
+
+//    public String createReview(String authHeader, ReviewCreateDto request) {
+//        String token = jwtHelper.extractToken(authHeader);
+//        Map<String, Object> payload = jwtHelper.decodeToken(token);
+//
+//        if (payload == null) {
+//            throw new RuntimeException("Token is invalid or expired");
+//        }
+//
+//        try {
+//            int userId = ((Number) payload.get("id")).intValue();
+//            Users user = userRepository.findById(userId)
+//                    .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+//
+//            Rooms room = roomRepository.findById(request.getRoomId())
+//                    .orElseThrow(() -> new RuntimeException("Room not found with ID: " + request.getRoomId()));
+//
+//            // Check if the user has already reviewed this room
+//            Reviews existingReview = reviewRepository.findByUserAndRoom(user, room);
+////            if (existingReview != null) {
+////                // If a review exists, delete the existing review
+////                reviewRepository.delete(existingReview);
+////            }
+//            if (existingReview != null) {
+//                // Update existing review
+//                existingReview.setRating(request.getRating());
+//                existingReview.setComment(request.getComment());
+//                existingReview.setCreatedAt(LocalDateTime.now());
+//
+//                existingReview.setModifiedAt(LocalDateTime.now());
+//                existingReview.setModifiedBy(userId);
+//                reviewRepository.save(existingReview);
+//                return "updated";
+//            }
+//
+//            Reviews review = new Reviews();
+//            review.setRoom(room);
+//            review.setUser(user);
+//            review.setRating(request.getRating());
+//            review.setComment(request.getComment());
+//            review.setCreatedAt(LocalDateTime.now());
+//            review.setModifiedAt(LocalDateTime.now());
+//            review.setCreatedBy(userId); // Example: Set createdBy as userId
+//            review.setModifiedBy(userId); // Example: Set modifiedBy as userId
+//
+//            reviewRepository.save(review);
+//            return "created";
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to create review: " + e.getMessage(), e);
+//        }
+//    }
 
     @Override
     public List<ReviewResponseDto> getReviewsByRoomId( Long roomId) {
