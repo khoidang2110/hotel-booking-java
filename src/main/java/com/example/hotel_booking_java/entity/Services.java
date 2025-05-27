@@ -1,37 +1,26 @@
 package com.example.hotel_booking_java.entity;
-import com.example.hotel_booking_java.enums.RoomStatus;
-import com.example.hotel_booking_java.enums.RoomType;
+
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+
 @Entity
-@Table(name = "rooms")
+@Table(name = "services")
 @Data
-public class Rooms {
+public class Services {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "room_number", unique = true, nullable = false)
-    private String roomNumber;
-
-    @Enumerated(EnumType.STRING)
-    //@Convert(converter = RoomTypeEnumConverter.class)
-    @Column(name = "type", nullable = false)
-    private RoomType type;
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
 
     @Column(name = "price", nullable = false)
     private BigDecimal price;
-
-    //    @Column(name = "status", nullable = false)
-//    private RoomStatus status = RoomStatus.AVAILABLE;
-    @Enumerated(EnumType.STRING)
-//@Convert(converter = RoomStatusEnumConverter.class)
-    @Column(name = "status", nullable = false)
-    private RoomStatus status = RoomStatus.AVAILABLE;
 
     @Column(name = "description")
     private String description;
@@ -47,7 +36,4 @@ public class Rooms {
 
     @Column(name = "modified_by")
     private Integer modifiedBy;
-
-
 }
-

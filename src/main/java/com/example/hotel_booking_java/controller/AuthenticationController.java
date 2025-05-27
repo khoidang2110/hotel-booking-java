@@ -7,7 +7,7 @@ import com.example.hotel_booking_java.dto.user.LoginRequestDto;
 import com.example.hotel_booking_java.dto.user.LoginResponseDto;
 import com.example.hotel_booking_java.payload.response.BaseResponse;
 import com.example.hotel_booking_java.services.AuthenticationServices;
-import com.example.hotel_booking_java.services.LoginAttemptService;
+import com.example.hotel_booking_java.services.LoginAttemptServices;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +36,7 @@ public class AuthenticationController {
     private AuthenticationServices authenticationServices;
 
     @Autowired
-    private LoginAttemptService loginAttemptService;
+    private LoginAttemptServices loginAttemptService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto request) {

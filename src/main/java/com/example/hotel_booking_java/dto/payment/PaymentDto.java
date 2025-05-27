@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
@@ -19,4 +20,7 @@ public class PaymentDto {
     private LocalDateTime modifiedAt;
     private int createdBy;
     private Integer modifiedBy;
+
+    private List<PaymentDetailDto> paymentDetails; // Thêm dòng này
+
 }

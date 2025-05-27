@@ -3,13 +3,11 @@ package com.example.hotel_booking_java.controller;
 import com.example.hotel_booking_java.dto.payment.CreatePaymentDto;
 import com.example.hotel_booking_java.dto.payment.PaymentDto;
 import com.example.hotel_booking_java.dto.payment.UpdatePaymentDto;
-import com.example.hotel_booking_java.dto.review.ReviewCreateDto;
-import com.example.hotel_booking_java.dto.user.UserPermissionDto;
 import com.example.hotel_booking_java.entity.Payments;
 import com.example.hotel_booking_java.payload.request.PagingRequest;
 import com.example.hotel_booking_java.payload.response.BaseResponse;
 import com.example.hotel_booking_java.repository.PaymentRepository;
-import com.example.hotel_booking_java.services.PaymentService;
+import com.example.hotel_booking_java.services.PaymentServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,8 @@ public class PaymentController {
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
     @Autowired
-    private PaymentService paymentService;
+    private PaymentServices paymentService;
+
     @Autowired
     private PaymentRepository paymentRepository;
 
@@ -56,7 +55,7 @@ public class PaymentController {
         int size = pagingRequest.getSize();
 
         try {
-            List<Payments> payments = paymentService.getAllPayments(authHeader, page, size);
+            List<PaymentDto> payments = paymentService.getAllPayments(authHeader, page, size);
             response.setMessage("payment get successfully");
             response.setData(payments);
             return ResponseEntity.ok(response);
@@ -109,7 +108,7 @@ public class PaymentController {
 
         try {
             // Tiến hành lấy payment từ service
-            Payments payment = paymentService.getPaymentById(authHeader, id);
+            PaymentDto payment = paymentService.getPaymentById(authHeader, id);
 
             if (payment != null) {
                 System.out.println("Found payment: " + payment);

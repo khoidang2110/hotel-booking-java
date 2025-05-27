@@ -1,7 +1,7 @@
 package com.example.hotel_booking_java.services.impl;
 
 
-import com.example.hotel_booking_java.services.LoginAttemptService;
+import com.example.hotel_booking_java.services.LoginAttemptServices;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.stereotype.Service;
@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class LoginAttemptServiceImpl implements LoginAttemptService {
+public class LoginAttemptServicesImpl implements LoginAttemptServices {
 
     private final Cache<String, Integer> attemptsCache;
 
     private static final int MAX_ATTEMPTS = 3;
 
-    public LoginAttemptServiceImpl() {
+    public LoginAttemptServicesImpl() {
         this.attemptsCache = Caffeine.newBuilder()
                 .expireAfterWrite(30, TimeUnit.SECONDS)
                 .maximumSize(500)

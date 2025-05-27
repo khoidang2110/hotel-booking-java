@@ -6,6 +6,7 @@ import com.example.hotel_booking_java.entity.Users;
 
 import com.example.hotel_booking_java.enums.PaymentMethod;
 import com.example.hotel_booking_java.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,7 +14,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity(name = "payments")
@@ -66,4 +68,9 @@ public class Payments {
     @ManyToOne
     @JoinColumn(name = "created_by")
     private Users createdBy;
+
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // Cho phép serialize phần details này
+    private List<PaymentDetail> paymentDetails = new ArrayList<>();
+
 }

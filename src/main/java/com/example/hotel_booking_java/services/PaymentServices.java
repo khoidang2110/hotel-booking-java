@@ -7,10 +7,10 @@ import com.example.hotel_booking_java.entity.Payments;
 
 import java.util.List;
 
-public interface PaymentService {
+public interface PaymentServices {
+    PaymentDto getPaymentById(String authHeader, int paymentId) ;
+  List<PaymentDto> getAllPayments(String authHeader, int page, int size);
     void createPayment(String authHeader, CreatePaymentDto request);
-    Payments getPaymentById(String authHeader, int paymentId) ;
-  List<Payments> getAllPayments(String authHeader, int page, int size);
 
     void updatePayment(String authHeader, UpdatePaymentDto request);
     void deletePayment(String authHeader,int id);
