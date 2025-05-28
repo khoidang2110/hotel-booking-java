@@ -1,9 +1,6 @@
 package com.example.hotel_booking_java.services.impl;
 
-import com.example.hotel_booking_java.dto.payment.CreatePaymentDto;
-import com.example.hotel_booking_java.dto.payment.PaymentDto;
-import com.example.hotel_booking_java.dto.payment.PaymentServiceItemDto;
-import com.example.hotel_booking_java.dto.payment.UpdatePaymentDto;
+import com.example.hotel_booking_java.dto.payment.*;
 import com.example.hotel_booking_java.dto.user.UserPermissionDto;
 import com.example.hotel_booking_java.entity.*;
 import com.example.hotel_booking_java.mapper.PaymentMapper;
@@ -19,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,69 +42,9 @@ public class PaymentServicesImpl implements PaymentServices {
     @Autowired
     private PaymentDetailRepository paymentDetailRepository;
 
-    public PaymentDto convertToDto(Payments payment) {
-        PaymentDto paymentDto = new PaymentDto();
-        paymentDto.setId(payment.getId());
-      //  paymentDto.setBookingId(payment.getBookingId());
-        paymentDto.setBookingId(payment.getBooking().getId());
 
-        paymentDto.setAmount(payment.getAmount());
-        paymentDto.setPaymentMethod(payment.getPaymentMethod());
-        paymentDto.setStatus(payment.getStatus());
-        paymentDto.setCreatedAt(payment.getCreatedAt());
-        paymentDto.setModifiedAt(payment.getModifiedAt());
-        paymentDto.setCreatedBy(payment.getCreatedBy().getId());
-        paymentDto.setModifiedBy(payment.getModifiedBy());
 
-        return paymentDto;
-    }
 
-//    @Override
-//    public void createPayment(String authHeader, CreatePaymentDto request) {
-//
-//
-//
-//
-//
-//        UserPermissionDto permission = jwtHelper.getUserPermission(authHeader);
-//
-//        if (permission.isHasPermission()) {
-//            // Người dùng có quyền, xử lý tiếp theo
-//            int userId = permission.getUserId();
-//            // Tiến hành xử lý với userId
-//
-//            if (paymentRepository.existsByBooking_Id(request.getBookingId())) {
-//                throw new RuntimeException("Payment already exists for this booking_id: " + request.getBookingId());
-//            }
-//
-//            try {
-//                Bookings booking = bookingRepository.findById(request.getBookingId())
-//                        .orElseThrow(() -> new RuntimeException("Booking not found with id: " + request.getBookingId()));
-//
-//                Users user = userRepository.findById(userId)
-//                        .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-//
-//                Payments payment = new Payments();
-//                payment.setBooking(booking);
-//                payment.setAmount(request.getAmount());
-//                payment.setPaymentMethod(request.getPaymentMethod());
-//                payment.setStatus(request.getStatus());
-//                // payment.setCreatedBy(Integer.parseInt(payload.get("id").toString()));
-//                payment.setCreatedBy(user);
-//
-//                paymentRepository.save(payment);
-//            } catch (IllegalArgumentException e) {
-//                throw new RuntimeException("Invalid payment method or status", e);
-//            }
-//
-//        } else {
-//
-//            throw new RuntimeException("Permission denied");
-//        }
-//
-//
-//    }
-//
 
 
     @Override
@@ -252,6 +190,72 @@ public class PaymentServicesImpl implements PaymentServices {
         paymentRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional
+    public void addServiceToPayment(String authHeader,AddServiceToPaymentDto request) {
+        // Kiểm tra quyền người dùng từ JWT
+        System.out.println("run add service task " );
 
+        UserPermissionDto permission = jwtHelper.getUserPermission(authHeader);
+        if (!permission.isHasPermission()) {
+            throw new RuntimeException("Permission denied");
+        }
+
+        Payments payment = paymentRepository.findById(request.getPaymentId())
+                .orElseThrow(() -> new RuntimeException("Payment not found with id: " + request.getPaymentId()));
+
+        Services service = serviceRepository.findById(request.getServiceId())
+                .orElseThrow(() -> new RuntimeException("Service not found with id: " + request.getServiceId()));
+
+        BigDecimal lineTotal = service.getPrice().multiply(BigDecimal.valueOf(request.getQuantity()));
+
+        PaymentDetail detail = new PaymentDetail();
+        detail.setPayment(payment);
+        detail.setService(service);
+        detail.setQuantity(request.getQuantity());
+        detail.setPrice(service.getPrice());
+        detail.setTotal(lineTotal);
+
+        paymentDetailRepository.save(detail);
+
+        // Cập nhật tổng tiền mới cho payment
+        BigDecimal newAmount = payment.getAmount().add(lineTotal);
+        payment.setAmount(newAmount);
+        payment.setModifiedAt(LocalDateTime.now());
+
+        paymentRepository.save(payment);
+    }
+
+    @Override
+    @Transactional
+    public void removeServiceFromPayment(String authHeader, int paymentDetailId) {
+        // Kiểm tra quyền người dùng từ JWT
+        UserPermissionDto permission = jwtHelper.getUserPermission(authHeader);
+        if (!permission.isHasPermission()) {
+            throw new RuntimeException("Permission denied");
+        }
+
+        // Tìm chi tiết thanh toán để xoá
+        PaymentDetail paymentDetail = paymentDetailRepository.findById(paymentDetailId)
+                .orElseThrow(() -> new RuntimeException("Payment detail not found with id: " + paymentDetailId));
+
+        // Lấy số tiền của chi tiết thanh toán này để giảm tổng số tiền của thanh toán chính
+        BigDecimal lineTotal = paymentDetail.getTotal();
+
+        // Tìm thanh toán chính
+        Payments payment = paymentDetail.getPayment();
+
+        // Xoá chi tiết thanh toán khỏi danh sách chi tiết của thanh toán chính
+        payment.getPaymentDetails().remove(paymentDetail);
+
+        // Cập nhật tổng số tiền mới cho thanh toán chính
+        BigDecimal newAmount = payment.getAmount().subtract(lineTotal);
+        payment.setAmount(newAmount);
+        payment.setModifiedAt(LocalDateTime.now());
+
+        // Lưu lại các thay đổi
+        paymentRepository.save(payment);
+        paymentDetailRepository.delete(paymentDetail);
+    }
 
 }

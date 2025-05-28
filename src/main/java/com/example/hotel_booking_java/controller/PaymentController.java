@@ -1,5 +1,6 @@
 package com.example.hotel_booking_java.controller;
 
+import com.example.hotel_booking_java.dto.payment.AddServiceToPaymentDto;
 import com.example.hotel_booking_java.dto.payment.CreatePaymentDto;
 import com.example.hotel_booking_java.dto.payment.PaymentDto;
 import com.example.hotel_booking_java.dto.payment.UpdatePaymentDto;
@@ -44,6 +45,37 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
+    }
+    @PostMapping("/add-service")
+    public ResponseEntity<?> addServiceToPayment(
+            @RequestHeader("Authorization") String authHeader,
+                                                 @RequestBody AddServiceToPaymentDto request) {
+        BaseResponse response = new BaseResponse();
+
+        try {
+            paymentService.addServiceToPayment(authHeader, request);
+            response.setMessage("Service added to payment successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage("Failed to add service to payment: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+    @DeleteMapping("/remove-service/{paymentDetailId}")
+    public ResponseEntity<?> removeServiceFromPayment(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable int paymentDetailId) {
+
+        BaseResponse response = new BaseResponse();
+
+        try {
+            paymentService.removeServiceFromPayment(authHeader, paymentDetailId);
+            response.setMessage("Service removed from payment successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage("Failed to remove service from payment: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
     @PostMapping("/list")
