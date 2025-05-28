@@ -1,5 +1,6 @@
 package com.example.hotel_booking_java.dto.payment;
 
+import com.example.hotel_booking_java.dto.BookingDTO;
 import com.example.hotel_booking_java.enums.PaymentMethod;
 import com.example.hotel_booking_java.enums.PaymentStatus;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class PaymentDto {
     private LocalDateTime modifiedAt;
     private int createdBy;
     private Integer modifiedBy;
+
+    private BookingDTO booking; // ✅ Thêm dòng này
 
     private List<PaymentDetailDto> paymentDetails; // Thêm dòng này
 

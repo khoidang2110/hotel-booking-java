@@ -1,5 +1,6 @@
 package com.example.hotel_booking_java.dto;
 
+import com.example.hotel_booking_java.dto.user.UserInfoResponseDto;
 import com.example.hotel_booking_java.entity.Rooms;
 import com.example.hotel_booking_java.enums.BookingEnum;
 import lombok.Data;
@@ -13,6 +14,8 @@ import java.time.LocalDateTime;
 public class BookingDTO {
     private Integer id;
     private Integer userId;
+    private UserInfoResponseDto user; // ➕ thêm dòng này
+
     private Rooms room;
     private LocalDate checkIn;
     private LocalDate checkOut;

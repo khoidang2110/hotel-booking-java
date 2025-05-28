@@ -15,6 +15,12 @@ public class PaymentMapper {
     public static PaymentDto toDto(Payments payment) {
         PaymentDto dto = new PaymentDto();
         dto.setId(payment.getId());
+
+        // Lấy bookingId từ entity
+        if (payment.getBooking() != null) {
+            dto.setBookingId(payment.getBooking().getId());
+        }
+
         dto.setAmount(payment.getAmount());
         dto.setPaymentMethod(payment.getPaymentMethod());
         dto.setStatus(payment.getStatus());
@@ -24,6 +30,7 @@ public class PaymentMapper {
         // mapping booking và createdBy
 //        dto.setBooking(BookingMapper.toDto(payment.getBooking()));
 //        dto.setCreatedBy(UserMapper.toDto(payment.getCreatedBy()));
+        dto.setBooking(BookingMapper.toDto(payment.getBooking())); // ✅ thêm dòng này
 
         // mapping paymentDetails
         List<PaymentDetailDto> detailDtos = new ArrayList<>();
@@ -47,4 +54,6 @@ public class PaymentMapper {
 
         return dto;
     }
+
+
 }
