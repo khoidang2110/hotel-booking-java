@@ -1,6 +1,8 @@
 package com.example.hotel_booking_java.services;
 
 import com.example.hotel_booking_java.dto.RoomDTO;
+import com.example.hotel_booking_java.payload.request.BookingRequest;
+import com.example.hotel_booking_java.payload.request.FindRoomAvailableRequest;
 import com.example.hotel_booking_java.payload.request.RoomRequest;
 
 import java.math.BigDecimal;
@@ -14,4 +16,5 @@ public interface RoomServices {
     List<RoomDTO> getAllRooms(int pageNumber, int pageSize);
     RoomDTO updateRoom(int id, RoomRequest req, int userId);
     void deleteRoom(int id);
+    List<RoomDTO> findAvailableWithCapacity(FindRoomAvailableRequest request);
 }

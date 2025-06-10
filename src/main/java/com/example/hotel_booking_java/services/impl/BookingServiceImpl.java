@@ -6,8 +6,11 @@ import com.example.hotel_booking_java.entity.Rooms;
 import com.example.hotel_booking_java.entity.Users;
 import com.example.hotel_booking_java.enums.BookingEnum;
 import com.example.hotel_booking_java.payload.request.BookingRequest;
+import com.example.hotel_booking_java.payload.request.GuestBookingRequest;
+import com.example.hotel_booking_java.payload.request.UserBookingRequest;
 import com.example.hotel_booking_java.repository.BookingRepo;
 import com.example.hotel_booking_java.repository.RoomRepository;
+import com.example.hotel_booking_java.repository.UserRepository;
 import com.example.hotel_booking_java.services.BookingServices;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,10 +29,16 @@ public class BookingServiceImpl implements BookingServices {
     private BookingRepo bookingRepo;
 
     @Autowired
+    private UserRepository usersRepo;
+
+    @Autowired
+    private RoomRepository roomsRepo;
+
+    @Autowired
     private RoomRepository roomRepo;
 
-    private BigDecimal calcTotal(Rooms room, BookingRequest r) {
-        long nights = ChronoUnit.DAYS.between(r.getCheckIn(), r.getCheckOut());
+    private BigDecimal calcTotal(Rooms room, LocalDate checkIn, LocalDate checkOut) {
+        long nights = ChronoUnit.DAYS.between(checkIn, checkOut);
         return room.getPrice().multiply(BigDecimal.valueOf(nights));
     }
 
@@ -67,7 +77,7 @@ public class BookingServiceImpl implements BookingServices {
         b.setStatus(r.getStatus() == null ? BookingEnum.PENDING : r.getStatus());
 
         BigDecimal price = r.getTotalPrice() != null ? r.getTotalPrice()
-                : calcTotal(room, r);
+                : calcTotal(room, r.getCheckIn(), r.getCheckOut());
         b.setTotalPrice(price);
 
         b.setCreatedBy(userId);
@@ -98,7 +108,7 @@ public class BookingServiceImpl implements BookingServices {
             Rooms room = roomRepo.findById(r.getRoomId())
                     .orElseThrow(() -> new RuntimeException("Room not found"));
             b.setRoom(room);
-            b.setTotalPrice(calcTotal(room, r));
+            b.setTotalPrice(calcTotal(room, r.getCheckIn(), r.getCheckOut()));
         }
         if (r.getCheckIn() != null) b.setCheckIn(r.getCheckIn());
         if (r.getCheckOut() != null) b.setCheckOut(r.getCheckOut());
@@ -112,5 +122,70 @@ public class BookingServiceImpl implements BookingServices {
     @Override
     public void deleteBooking(int id) {
         bookingRepo.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public BookingDTO createGuestBooking(GuestBookingRequest req) {
+        // 1) Create a “guest” user
+        Users guest = new Users();
+        guest.setFullName(req.getGuestName());
+        guest.setEmail(req.getGuestEmail());
+        guest.setPhone(req.getGuestPhoneNumber());
+        guest.setPassword("123456"); // Default password for guest, should be hashed in production
+        guest.setRoleId(1); // or a dedicated GUEST_ROLE_ID constant
+        Users savedGuest = usersRepo.save(guest);
+
+        // 2) Lookup the room
+        Rooms room = roomsRepo.findById(req.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        // 3) Build the booking
+        Bookings booking = new Bookings();
+        booking.setUser(savedGuest);                      // ← use the persisted user
+        booking.setRoom(room);                            // ← set the room
+        booking.setCheckIn(req.getCheckIn());
+        booking.setCheckOut(req.getCheckOut());
+        booking.setStatus(BookingEnum.PENDING);
+        booking.setTotalPrice(calcTotal(room, req.getCheckIn(), req.getCheckOut()));
+        booking.setCouponDiscountId(null);
+        booking.setSpecialDayDiscountId(null);
+        booking.setCreatedBy(savedGuest.getId());         // ← creator is the guest
+        booking.setModifiedBy(savedGuest.getId());
+
+        bookingRepo.save(booking);
+        return toDto(booking);
+    }
+
+    @Override
+    public BookingDTO createUserBooking(UserBookingRequest req, Integer userId) {
+        // 1) Find the existing user by phone
+        Users user = usersRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        String phone = user.getPhone();  // ← here’s the phone
+
+
+        // 2) Lookup the room
+        Rooms room = roomsRepo.findById(req.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        // 3) Build and save the booking
+        Bookings booking = new Bookings();
+        booking.setUser(user);
+        booking.setRoom(room);
+        booking.setCheckIn(req.getCheckIn());
+        booking.setCheckOut(req.getCheckOut());
+        booking.setStatus(BookingEnum.PENDING);
+        booking.setTotalPrice(calcTotal(room, req.getCheckIn(), req.getCheckOut()));
+
+        // If you have coupon/special‐day codes, look them up here and set the IDs:
+        booking.setCouponDiscountId(null);
+        booking.setSpecialDayDiscountId(null);
+
+        booking.setCreatedBy(user.getId());
+        booking.setModifiedBy(user.getId());
+
+        bookingRepo.save(booking);
+        return toDto(booking);
     }
 }

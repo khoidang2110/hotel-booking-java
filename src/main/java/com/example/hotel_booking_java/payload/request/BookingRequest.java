@@ -28,6 +28,7 @@ public class BookingRequest {
     private BigDecimal totalPrice;
 
     private Integer couponDiscountId;
+
     private Integer specialDayDiscountId;
 
     @AssertTrue(message = "check‑out must be **after** check‑in")
@@ -35,4 +36,7 @@ public class BookingRequest {
         return checkIn == null || checkOut == null || checkOut.isAfter(checkIn);
     }
 
+    private Integer adultNumber;
+
+    private Integer childNumber;
 }
