@@ -5,9 +5,9 @@
 A comprehensive hotel management system built with modern web technologies, featuring user authentication, service management, and payment processing capabilities.
 🔗 Links
 
-Demo Video: Watch Demo
-Live Demo: hotel-fe-omega.vercel.app
-Frontend Repository: GitHub - hotel_fe
+Demo video: https://www.youtube.com/watch?v=f7N0dqHFO0I
+Front end repo: https://github.com/khoidang2110/hotel_fe
+Deploy link: https://hotel-fe-omega.vercel.app
 
 ✅ Features Implemented
 👤 User Management
