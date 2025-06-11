@@ -9,6 +9,4 @@ public class BaseResponse {
     private int code;
     private String message;
     private Object data;
-
-
 }

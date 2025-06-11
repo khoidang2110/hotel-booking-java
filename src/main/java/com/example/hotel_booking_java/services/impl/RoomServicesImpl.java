@@ -4,7 +4,10 @@ import com.example.hotel_booking_java.dto.RoomDTO;
 import com.example.hotel_booking_java.entity.Rooms;
 import com.example.hotel_booking_java.enums.RoomStatus;
 import com.example.hotel_booking_java.enums.RoomType;
+import com.example.hotel_booking_java.payload.request.BookingRequest;
+import com.example.hotel_booking_java.payload.request.FindRoomAvailableRequest;
 import com.example.hotel_booking_java.payload.request.RoomRequest;
+import com.example.hotel_booking_java.repository.BookingRepo;
 import com.example.hotel_booking_java.repository.RoomRepository;
 import com.example.hotel_booking_java.services.RoomServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class RoomServicesImpl implements RoomServices {
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private BookingRepo bookingRepo;
 
     private RoomDTO toDto(Rooms r) {
         RoomDTO d = new RoomDTO();
@@ -43,7 +48,8 @@ public class RoomServicesImpl implements RoomServices {
     @Override
     public List<RoomDTO> findAvailable(LocalDate checkIn, LocalDate checkOut) {
         return roomRepository.findAvailableRooms(checkIn, checkOut)
-                .stream().map(this::toDto).collect(Collectors.toList());    }
+                .stream().map(this::toDto).collect(Collectors.toList());
+    }
 
     @Override
     public boolean isRoomAvailable(int roomId, LocalDate checkIn, LocalDate checkOut) {
@@ -79,14 +85,15 @@ public class RoomServicesImpl implements RoomServices {
 
         if (req.getRoomNumber() != null && !req.getRoomNumber().isBlank())
             r.setRoomNumber(req.getRoomNumber().trim());
-        if (req.getType()  != null)       r.setType(req.getType());
-        if (req.getPrice() != null)       r.setPrice(req.getPrice());
+        if (req.getType() != null) r.setType(req.getType());
+        if (req.getPrice() != null) r.setPrice(req.getPrice());
         if (req.getDescription() != null) r.setDescription(req.getDescription());
 
         r.setModifiedAt(LocalDateTime.now());
         r.setModifiedBy(userId);
 
-        return toDto(roomRepository.save(r));    }
+        return toDto(roomRepository.save(r));
+    }
 
     @Override
     public void deleteRoom(int id) {
@@ -94,5 +101,31 @@ public class RoomServicesImpl implements RoomServices {
             throw new RuntimeException("Room not found with id " + id);
         }
         roomRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoomDTO> findAvailableWithCapacity(FindRoomAvailableRequest request) {
+        // Extract fields from request
+        var checkIn  = request.getCheckIn();
+        var checkOut = request.getCheckOut();
+        int adults   = request.getAdultNumber();
+        int children = request.getChildNumber();
+
+        // Reuse the existing repository method
+        List<Rooms> freeRooms = roomRepository.findAvailableRooms(checkIn, checkOut);
+
+        return freeRooms.stream()
+                .filter(r -> canAccommodate(r.getType(), adults, children))
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private boolean canAccommodate(RoomType type, int adults, int children) {
+        return switch (type) {
+            case SINGLE -> adults <= 1 && children <= 2;
+            case DOUBLE -> adults <= 2 && children <= 2;
+            case SUITE -> adults <= 4 && children <= 4;
+        };
     }
 }

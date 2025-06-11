@@ -1,12 +1,16 @@
 package com.example.hotel_booking_java.controller;
 
 import com.example.hotel_booking_java.dto.RoomDTO;
+import com.example.hotel_booking_java.payload.request.BookingRequest;
+import com.example.hotel_booking_java.payload.request.FindRoomAvailableRequest;
 import com.example.hotel_booking_java.payload.request.RoomRequest;
 import com.example.hotel_booking_java.payload.response.BaseResponse;
 import com.example.hotel_booking_java.services.RoomServices;
 import com.example.hotel_booking_java.utils.JwtHelper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -81,6 +85,14 @@ public class RoomController {
 
         boolean free = roomServices.isRoomAvailable(id, checkIn, checkOut);
         return ok("success", free);
+    }
+
+    @GetMapping("/suite")
+    public ResponseEntity<BaseResponse> findAvailableByCapacity(
+            @Valid @ModelAttribute FindRoomAvailableRequest bookingRequest
+    ) {
+        List<RoomDTO> list = roomServices.findAvailableWithCapacity(bookingRequest);
+        return ok("success", list);
     }
 
     private int tokenUserId(String authHeader) {

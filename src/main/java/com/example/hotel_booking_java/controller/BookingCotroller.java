@@ -3,12 +3,15 @@ package com.example.hotel_booking_java.controller;
 import com.example.hotel_booking_java.dto.BookingDTO;
 import com.example.hotel_booking_java.dto.user.SignUpRequestDto;
 import com.example.hotel_booking_java.payload.request.BookingRequest;
+import com.example.hotel_booking_java.payload.request.GuestBookingRequest;
+import com.example.hotel_booking_java.payload.request.UserBookingRequest;
 import com.example.hotel_booking_java.payload.response.BaseResponse;
 import com.example.hotel_booking_java.services.BookingServices;
 import com.example.hotel_booking_java.services.UserServices;
 import com.example.hotel_booking_java.utils.JwtHelper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -118,4 +121,51 @@ public class BookingCotroller {
             setMessage("Booking deleted");
         }});
     }
+
+    // 1) Guest booking (no auth required)
+    @PostMapping("/guest")
+    public ResponseEntity<BaseResponse> createGuestBooking(
+            @Valid @RequestBody GuestBookingRequest req) {
+        BookingDTO dto = bookingServices.createGuestBooking(req);
+        return ResponseEntity.ok(new BaseResponse(){
+            {
+                setCode(200);
+                setMessage("Guest booking created");
+                setData(dto);
+            }
+        });
+    }
+
+    // 2) User booking (must supply phone # matching an existing user)
+    @PostMapping("/user")
+    public ResponseEntity<BaseResponse> createUserBooking(
+            @RequestHeader(value="Authorization", required=false) String auth,
+            @Valid @RequestBody UserBookingRequest req) {
+
+        Integer userId = userIdFromHeader(auth);
+        if (userId == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new BaseResponse(){
+                        {
+                            setCode(401);
+                            setMessage("Invalid token");
+                        }
+                    });
+        }
+
+        BookingDTO dto = bookingServices.createUserBooking(req, userId);
+        return ResponseEntity.ok(
+                new BaseResponse(){
+                    {
+                        setCode(200);
+                        setMessage("User booking created");
+                        setData(dto);
+                    }
+                }
+        );
+    }
+
+
+
 }
