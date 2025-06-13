@@ -1,4 +1,4 @@
-package com.example.hotel_booking_java.excections;
+package com.example.hotel_booking_java.exceptions;
 
 public class InsertException extends RuntimeException {
     public InsertException(String message) {
