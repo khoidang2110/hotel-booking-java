@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: hotel_booking_java
+    restart: always
+#    environment:
+#      - ENV=production
+    ports:
+      - "8092:8092"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=traefik'
+
+      # Cấu hình HTTP
+      - 'traefik.http.routers.hotel-java.entrypoints=http'
+      - 'traefik.http.routers.hotel-java.rule=Host(`java.tichluyvang.com`)'
+      - "traefik.http.routers.hotel-java.service=hotel-java-service"
+
+
+      # Cấu hình HTTPS
+      - 'traefik.http.routers.hotel-java-secure.entrypoints=https'
+      - 'traefik.http.routers.hotel-java-secure.rule=Host(`java.tichluyvang.com`)'
+      - 'traefik.http.routers.hotel-java-secure.tls.certresolver=letsencrypt'
+
+      # Chuyển tiếp yêu cầu đến container Spring Boot
+      - "traefik.http.services.hotel-java-service.loadbalancer.server.port=8092"
+
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
