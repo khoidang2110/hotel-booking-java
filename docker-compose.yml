@@ -13,17 +13,18 @@ services:
       - 'traefik.enable=true'
       - 'traefik.docker.network=traefik'
 
-      # Cấu hình HTTP
+      # HTTP
       - 'traefik.http.routers.hotel.entrypoints=http'
       - 'traefik.http.routers.hotel.rule=Host(`java.thepointsaver.com`)'
 
-      # Cấu hình HTTPS
+      # HTTPS
       - 'traefik.http.routers.hotel-secure.entrypoints=https'
       - 'traefik.http.routers.hotel-secure.rule=Host(`java.thepointsaver.com`)'
       - 'traefik.http.routers.hotel-secure.tls.certresolver=letsencrypt'
-      - "traefik.http.routers.hotel-secure.service=hotel-service"
+      - "traefik.http.routers.hotel-secure.service=hotel"
 
-      # Chuyển tiếp yêu cầu đến container Spring Boot
+
+        # Chuyển tiếp yêu cầu đến container Spring Boot
       - "traefik.http.services.hotel.loadbalancer.server.port=8091"
 
     networks:
