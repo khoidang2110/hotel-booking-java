@@ -16,16 +16,16 @@ services:
       # HTTP
       - 'traefik.http.routers.hotel.entrypoints=http'
       - 'traefik.http.routers.hotel.rule=Host(`java.thepointsaver.com`)'
+      - 'traefik.http.routers.hotel.service=hotel-java'
 
       # HTTPS
       - 'traefik.http.routers.hotel-secure.entrypoints=https'
       - 'traefik.http.routers.hotel-secure.rule=Host(`java.thepointsaver.com`)'
       - 'traefik.http.routers.hotel-secure.tls.certresolver=letsencrypt'
-      - "traefik.http.routers.hotel-secure.service=hotel"
+      - "traefik.http.routers.hotel-secure.service=hotel-java"
 
-
-        # Chuyển tiếp yêu cầu đến container Spring Boot
-      - "traefik.http.services.hotel.loadbalancer.server.port=8091"
+      # Service forwarding
+      - "traefik.http.services.hotel-java.loadbalancer.server.port=8091"
 
     networks:
       - traefik
