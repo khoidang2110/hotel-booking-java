@@ -16,7 +16,7 @@ services:
       # Cấu hình HTTP
       - 'traefik.http.routers.hotel-java.entrypoints=http'
       - 'traefik.http.routers.hotel-java.rule=Host(`java.tichluyvang.com`)'
-      - "traefik.http.routers.hotel-java.service=hotel-service"
+      - "traefik.http.routers.hotel-java.service=hotel-java-service"
 
 
       # Cấu hình HTTPS
