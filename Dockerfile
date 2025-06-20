@@ -7,6 +7,6 @@ COPY . .
 
 RUN ./mvnw clean package -DskipTests
 
-EXPOSE 8091
+EXPOSE 8092
 
 CMD ["java", "-jar", "target/hotel-booking-java-0.0.1-SNAPSHOT.jar"]
