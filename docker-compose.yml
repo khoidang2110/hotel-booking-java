@@ -25,7 +25,7 @@ services:
       - 'traefik.http.routers.hotel-java-secure.tls.certresolver=letsencrypt'
 
       # Chuyển tiếp yêu cầu đến container Spring Boot
-      - "traefik.http.services.hotel-java-service.loadbalancer.server.port=8091"
+      - "traefik.http.services.hotel-java-service.loadbalancer.server.port=8092"
 
     networks:
       - traefik
